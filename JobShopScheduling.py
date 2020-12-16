@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 class JSSP:
     '''
@@ -42,18 +43,22 @@ class JSSP:
 
     def plot(self, Seq):
         fig, ax = plt.subplots()
+        cmap = plt.cm.get_cmap("summer", self.n_job)(np.linspace(0.15, 0.85, self.n_job))
+
         machine_end_time = np.zeros(self.m_machine)
         job_end_time = np.zeros(self.n_job)
-        cmap = plt.cm.get_cmap("summer", self.n_job)
-        for i in range(self.n_job):
+        for i in zip(range(self.n_job)):
             for j in range(self.m_machine):
                 job = int(Seq[i, j])
                 end = max(machine_end_time[j], job_end_time[job]) + self.Processing_time[job, j]
-                ax.barh(j, color=cmap(job), width=self.Processing_time[job, j], left=max(machine_end_time[j], job_end_time[job]))
+                ax.barh(j, color=cmap[job], width=self.Processing_time[job, j], left=max(machine_end_time[j], job_end_time[job]))
                 machine_end_time[j] = end
                 job_end_time[job] = end
 
+        blocks = [mpatches.Patch(color=cmap[i], label="Job "+str(i)) for i in range(self.n_job)]
+        ax.legend(handles=blocks, bbox_to_anchor=(1.05, 1), loc='upper left')
         ax.set_yticks(range(self.m_machine))
-        ax.set_yticklabels([str(i + 1) for i in range(self.m_machine)])
+        ax.set_yticklabels(['Machine ' + str(i + 1) for i in range(self.m_machine)])
+        ax.set_xlabel("time")
         plt.show()
         return fig
