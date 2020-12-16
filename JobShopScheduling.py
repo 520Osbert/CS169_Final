@@ -6,7 +6,7 @@ class JSSP:
     '''
     m machines, n jobs, each machine need to finish jobs with specific orders
     '''
-    def __init__(self, n, m, Processing_time=0, randopt=False, low=0, high=20):
+    def __init__(self, n, m, Processing_time=0, randopt=False, low=1, high=20):
         self.m_machine = m
         self.n_job = n
         if randopt:
@@ -24,19 +24,19 @@ class JSSP:
 
     def get_end_time(self, Seq):
         '''
-        Seq is nxm that each column lists the jobs that machine will do in order
+        Seq is nxm that each row lists the machines that the job will do in order
         '''
         assert Seq.shape == (self.n_job, self.m_machine)
         machine_end_time = np.zeros(self.m_machine)
         job_end_time = np.zeros(self.n_job)
-        for i in range(self.n_job):
-            for j in range(self.m_machine):
-                job = int(Seq[i, j])
-                print(job, j)
-                end = max(machine_end_time[j], job_end_time[job]) + self.Processing_time[job, j]
-                machine_end_time[j] = end
-                job_end_time[job] = end
-                print(machine_end_time, job_end_time)
+        for j in range(self.m_machine):
+            for i in range(self.n_job):
+                machine = int(Seq[i, j])
+                print(machine, i)
+                end = max(machine_end_time[machine], job_end_time[i]) + self.Processing_time[i, j]
+                machine_end_time[machine] = end
+                job_end_time[i] = end
+                print(machine_end_time, job_end_time, end)
         return np.max(machine_end_time)
 
     def schedule_efficiency(self, Seq):
@@ -56,13 +56,15 @@ class JSSP:
 
         machine_end_time = np.zeros(self.m_machine)
         job_end_time = np.zeros(self.n_job)
-        for i in zip(range(self.n_job)):
-            for j in range(self.m_machine):
-                job = int(Seq[i, j])
-                end = max(machine_end_time[j], job_end_time[job]) + self.Processing_time[job, j]
-                ax.barh(j, color=cmap[job], width=self.Processing_time[job, j], left=max(machine_end_time[j], job_end_time[job]))
-                machine_end_time[j] = end
-                job_end_time[job] = end
+        for j in range(self.m_machine):
+            for i in range(self.n_job):
+                machine = int(Seq[i, j])
+                end = max(machine_end_time[machine], job_end_time[i]) + self.Processing_time[i, j]
+                ax.barh(machine, color=cmap[i], width=self.Processing_time[i, j],
+                        left=max(machine_end_time[machine], job_end_time[i]))
+
+                machine_end_time[machine] = end
+                job_end_time[i] = end
 
         blocks = [mpatches.Patch(color=cmap[i], label="Job "+str(i)) for i in range(self.n_job)]
         ax.legend(handles=blocks, bbox_to_anchor=(1.05, 1), loc='upper left')
