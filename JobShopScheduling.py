@@ -6,11 +6,20 @@ class JSSP:
     '''
     m machines, n jobs, each machine need to finish jobs with specific orders
     '''
-    def __init__(self, n, m, Processing_time):
+    def __init__(self, n, m, Processing_time=0, randopt=False, low=0, high=20):
         self.m_machine = m
         self.n_job = n
-        self.Processing_time = Processing_time
+        if randopt:
+            self.Processing_time = self.generate_rand_proc(low, high)
+        else:
+            self.Processing_time = Processing_time
         assert self.Processing_time.shape == (self.n_job, self.m_machine)
+
+    def generate_rand_proc(self, low, high):
+        return np.random.randint(low, high, size=(self.n_job, self.m_machine))
+
+    def generate_rand_seq(self):
+        return np.array([np.random.permutation(self.m_machine) for _ in range(self.n_job)])
 
 
     def get_end_time(self, Seq):
