@@ -21,8 +21,7 @@ class JSSP:
     def generate_rand_seq(self):
         return np.array([np.random.permutation(self.m_machine) for _ in range(self.n_job)])
 
-
-    def get_end_time(self, Seq):
+    def get_end_time(self, Seq, verbose=False):
         '''
         Seq is nxm that each row lists the machines that the job will do in order
         '''
@@ -32,11 +31,13 @@ class JSSP:
         for j in range(self.m_machine):
             for i in range(self.n_job):
                 machine = int(Seq[i, j])
-                print(machine, i)
+                if verbose:
+                    print(machine, i)
                 end = max(machine_end_time[machine], job_end_time[i]) + self.Processing_time[i, j]
                 machine_end_time[machine] = end
                 job_end_time[i] = end
-                print(machine_end_time, job_end_time, end)
+                if verbose:
+                    print(machine_end_time, job_end_time, end)
         return np.max(machine_end_time)
 
     def schedule_efficiency(self, Seq):
