@@ -1,18 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import Particle
 
 class JSSP:
     '''
     m machines, n jobs, each machine need to finish jobs with specific orders
     '''
-    def __init__(self, n, m, Processing_time=0, randopt=False, low=1, high=20):
+    def __init__(self, n, m, Processing_time, randopt=False, low=1, high=20):
         self.m_machine = m
         self.n_job = n
+        self.Processing_time = Processing_time
         if randopt:
             self.Processing_time = self.generate_rand_proc(low, high)
-        else:
-            self.Processing_time = Processing_time
+        
         assert self.Processing_time.shape == (self.n_job, self.m_machine)
 
     def generate_rand_proc(self, low, high):
@@ -20,6 +21,17 @@ class JSSP:
 
     def generate_rand_seq(self):
         return np.array([np.random.permutation(self.m_machine) for _ in range(self.n_job)])
+
+    def generate_rand_velocity(self):
+        return np.random.uniform(low=-(self.m_machine-1), high=self.m_machine-1, size=(self.n_job,self.m_machine))
+    
+    def PSO(self, particle_count):
+        '''
+        Use Particle Swarm Optimization to find minimal makespan given particle_count particles
+        '''
+        particles = [particle(self.generate_rand_seq(), self.generate_rand_velocity()) for _ in range(particle_count)]
+        retval = particle_swarm_optimization(self.get_end_time, particles, 200)
+        return retval
 
     def get_end_time(self, Seq, verbose=False):
         '''
