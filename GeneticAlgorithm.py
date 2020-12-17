@@ -26,7 +26,7 @@ def c_to_seq(chromosome, model):
 
 def fitness_function_JSSP(chromosome, model):
     seq = c_to_seq(chromosome, model)
-    return model.schedule_efficiency(seq)
+    return model.get_end_time(seq)
 
 
 def select(population, fitnesses, num):
@@ -69,10 +69,11 @@ def OnePointcrossover(a, b):
     return child
 
 
-def crossover(method, a, b, n, m, cross_rate=0.5):
-    if method == 'Uniform':
-        child = Uniformcrossover(a, b, cross_rate)
-    elif method == 'TwoPoint':
+def crossover(a, b, n, m, mode='multi'):
+    method = randint(0, 2)
+    if mode == 'Uniform' or (mode == 'multi' and method == 1):
+        child = Uniformcrossover(a, b)
+    elif mode == 'TwoPoint' or (mode == 'multi' and method == 2):
         child = TwoPointcrossover(a, b)
     else:
         child = OnePointcrossover(a, b)
@@ -88,8 +89,7 @@ def mutate(child, mutation_rate):
     return child
 
 
-
-def genetic_algorithm(model, max_iter=1000, pop_size=1000,  mutation_rate=0.8, cross_method='OnePoint', cross_rate=0.5):
+def genetic_algorithm(model, max_iter=1000, pop_size=1000,  mutation_rate=0.8, cross_method='multi'):
     population = init_rand_population(pop_size, model.m_machine, model.n_job)
     best_fit = np.inf
     ys = []
@@ -97,16 +97,16 @@ def genetic_algorithm(model, max_iter=1000, pop_size=1000,  mutation_rate=0.8, c
     best = None
     for k in range(max_iter):
         fitnesses = np.array([fitness_function_JSSP(p, model) for p in population])
-
         if np.min(fitnesses) < best_fit:
             best_fit = np.min(fitnesses)
             best = population[np.argmin(fitnesses)]
         ys.append(best_fit)
 
         parents = select(population, fitnesses, pop_size)
-        children = [crossover(cross_method, p[0], p[1], model.n_job, model.m_machine, cross_rate) for p in parents]
+        children = [crossover(p[0], p[1], model.n_job, model.m_machine, cross_method) for p in parents]
         population = [mutate(child, mutation_rate) for child in children]
     return c_to_seq(best, model), [ys, time() - start]
+
 
 if __name__ == '__main__':
     model = JSSP(2, 5, Processing_time=0, randopt=True)

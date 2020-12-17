@@ -17,7 +17,7 @@ class JSSP:
         assert self.Processing_time.shape == (self.n_job, self.m_machine)
 
     def generate_rand_proc(self, low, high):
-        return np.random.uniform(low, high, size=(self.n_job, self.m_machine))
+        return np.random.randint(low, high, size=(self.n_job, self.m_machine))
 
     def generate_rand_seq(self):
         return np.array([np.random.permutation(self.m_machine) for _ in range(self.n_job)])
