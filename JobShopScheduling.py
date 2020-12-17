@@ -17,7 +17,7 @@ class JSSP:
         assert self.Processing_time.shape == (self.n_job, self.m_machine)
 
     def generate_rand_proc(self, low, high):
-        return np.random.randint(low, high, size=(self.n_job, self.m_machine))
+        return np.random.uniform(low, high, size=(self.n_job, self.m_machine))
 
     def generate_rand_seq(self):
         return np.array([np.random.permutation(self.m_machine) for _ in range(self.n_job)])
@@ -29,15 +29,15 @@ class JSSP:
         '''
         Use Particle Swarm Optimization to find minimal makespan given particle_count particles
         '''
-        particles = [particle(self.generate_rand_seq(), self.generate_rand_velocity()) for _ in range(particle_count)]
-        retval = particle_swarm_optimization(self.get_end_time, particles, 200)
+        particles = [Particle.particle(self.generate_rand_seq(), self.generate_rand_velocity()) for _ in range(particle_count)]
+        retval = Particle.particle_swarm_optimization(self.get_end_time, particles, 200)
         return retval
 
     def get_end_time(self, Seq, verbose=False):
         '''
         Seq is nxm that each row lists the machines that the job will do in order
         '''
-        assert Seq.shape == (self.n_job, self.m_machine)
+        assert Seq.shape == (self.n_job, self.m_machine), f"{Seq.shape}, {self.n_job}, { self.m_machine}"
         machine_end_time = np.zeros(self.m_machine)
         job_end_time = np.zeros(self.n_job)
         for j in range(self.m_machine):
@@ -64,6 +64,8 @@ class JSSP:
 
 
     def plot(self, Seq):
+        assert Seq.shape == (self.n_job, self.m_machine)
+        Seq = Seq.astype(int)
         fig, ax = plt.subplots()
         cmap = plt.cm.get_cmap("summer", self.n_job)(np.linspace(0.15, 0.85, self.n_job))
 
