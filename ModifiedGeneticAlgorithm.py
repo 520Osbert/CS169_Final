@@ -148,7 +148,7 @@ def improve_crossover(population, model):
     return population
 
 
-def genetic_algorithm(model, max_iter=50, pop_size=100, max_crossover=10, k=2):
+def genetic_algorithm(model, max_iter=50, pop_size=100, max_crossover=10, best_k=2):
     population = init_rand_population(pop_size, model.m_machine, model.n_job)
     best_fit = np.inf
     ys = []
@@ -167,7 +167,7 @@ def genetic_algorithm(model, max_iter=50, pop_size=100, max_crossover=10, k=2):
             children += multi_crossover(p[0], p[1], p[2], model, Rc=max_crossover)
         population = mutate(children, model, 10, els=0.95)
         fitnesses = np.array([fitness_function_JSSP(p, model) for p in population])
-        best_index = np.argsort(fitnesses)[:k]
+        best_index = np.argsort(fitnesses)[:best_k]
         best_children = [population[i] for i in best_index]
         best_children = improve_crossover(best_children, model)
         for i, j in enumerate(best_index):
