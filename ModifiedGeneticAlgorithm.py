@@ -176,7 +176,7 @@ def modified_genetic_algorithm(model, max_iter=50, pop_size=100, max_crossover=1
 
 
 if __name__ == '__main__':
-    model = JSSP(5, 5, Processing_time=0, randopt=True)
+    model = JSSP(10, 10, Processing_time=0, randopt=True)
     res, stats = modified_genetic_algorithm(model)
     print(res)
     print(model.get_end_time(res))

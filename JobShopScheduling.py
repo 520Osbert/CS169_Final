@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import Particle
 
+
 class JSSP:
     '''
     m machines, n jobs, each machine need to finish jobs with specific orders
@@ -30,8 +31,8 @@ class JSSP:
         Use Particle Swarm Optimization to find minimal makespan given particle_count particles
         '''
         particles = [Particle.particle(self.generate_rand_seq(), self.generate_rand_velocity()) for _ in range(particle_count)]
-        retval = Particle.particle_swarm_optimization(self.get_end_time, particles, 200)
-        return retval
+        retval, results = Particle.particle_swarm_optimization(self.get_end_time, particles, 100)
+        return retval, results
 
     def get_end_time(self, Seq, verbose=False):
         '''

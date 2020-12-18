@@ -3,7 +3,7 @@ import random
 import math
 
 
-def randomSearch(job, maxIter=None):
+def randomSearch(job, maxIter=1000):
     '''
     random search for a given time, and find the best solutions
     '''

@@ -17,7 +17,8 @@ def findNeighbours(seq):
 
 def simulatedAnnealing(job, T, maxIter, halting, decrease):
     seq = job.generate_rand_seq()
-
+    ys = []
+    cost = job.get_end_time(seq)
     for i in range(halting):
         T = decrease * float(T)
 
@@ -34,4 +35,5 @@ def simulatedAnnealing(job, T, maxIter, halting, decrease):
                     if random.random() < p:
                         seq = k
                         cost = k_cost
-    return cost, seq
+        ys.append(cost)
+    return cost, seq, np.array(ys)
