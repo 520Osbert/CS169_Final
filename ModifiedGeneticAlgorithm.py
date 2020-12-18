@@ -148,7 +148,7 @@ def improve_crossover(population, model):
     return population
 
 
-def genetic_algorithm(model, max_iter=50, pop_size=100, max_crossover=10, best_k=2):
+def modified_genetic_algorithm(model, max_iter=50, pop_size=100, max_crossover=10, best_k=2):
     population = init_rand_population(pop_size, model.m_machine, model.n_job)
     best_fit = np.inf
     ys = []
