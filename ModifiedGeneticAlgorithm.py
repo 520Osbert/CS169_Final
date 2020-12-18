@@ -154,24 +154,37 @@ def modified_genetic_algorithm(model, max_iter=50, pop_size=100, max_crossover=1
     ys = []
     start = time()
     best = None
-    fitnesses = np.array([fitness_function_JSSP(p, model) for p in population])
     for k in range(max_iter):
+        # population = np.unique(population)
+        fitnesses = np.array([fitness_function_JSSP(p, model) for p in population])
+        pop_size = len(population)
         if np.min(fitnesses) < best_fit:
             best_fit = np.min(fitnesses)
             best = population[np.argmin(fitnesses)]
         ys.append(best_fit)
-
-        parents = select(population, fitnesses, pop_size//3)
+        if pop_size >= 3:
+            parents = select(population, fitnesses, pop_size//3)
+        else:
+            parents = population
         children = []
         for p in parents:
             children += multi_crossover(p[0], p[1], p[2], model, Rc=max_crossover)
         population = mutate(children, model, 10, els=0.95)
-        fitnesses = np.array([fitness_function_JSSP(p, model) for p in population])
-        best_index = np.argsort(fitnesses)[:best_k]
-        best_children = [population[i] for i in best_index]
-        best_children = improve_crossover(best_children, model)
-        for i, j in enumerate(best_index):
-            population[j] = best_children[i]
+
+        if pop_size >= best_k:
+            fitnesses = np.array([fitness_function_JSSP(p, model) for p in population])
+            best_index = np.argsort(fitnesses)[:best_k]
+            best_children = [population[i] for i in best_index]
+            best_children = improve_crossover(best_children, model)
+            for i, j in enumerate(best_index):
+                population[j] = best_children[i]
+        elif pop_size == 1:
+            fitness = fitness_function_JSSP(population[0], model)
+            if fitness < best_fit:
+                best_fit = np.min(fitness)
+                best = population[0]
+            ys.append(best_fit)
+            break
     return c_to_seq(best, model), [ys, time() - start]
 
 
