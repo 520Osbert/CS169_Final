@@ -67,6 +67,6 @@ def SAsearch(job, loopcount=100, T=200, maxIter=10, halting=10, decrease=0.8, mo
         if cost < best:
             best = cost
             best_seq = seq
-        costs.append(cost)
+        costs.append(best)
 
     return best, best_seq, costs
