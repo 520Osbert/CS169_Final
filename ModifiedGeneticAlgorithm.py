@@ -148,14 +148,14 @@ def improve_crossover(population, model):
     return population
 
 
-def genetic_algorithm(model, max_iter=50, pop_size=100, max_crossover=10):
+def genetic_algorithm(model, max_iter=50, pop_size=100, max_crossover=10, k=2):
     population = init_rand_population(pop_size, model.m_machine, model.n_job)
     best_fit = np.inf
     ys = []
     start = time()
     best = None
+    fitnesses = np.array([fitness_function_JSSP(p, model) for p in population])
     for k in range(max_iter):
-        fitnesses = np.array([fitness_function_JSSP(p, model) for p in population])
         if np.min(fitnesses) < best_fit:
             best_fit = np.min(fitnesses)
             best = population[np.argmin(fitnesses)]
@@ -166,12 +166,18 @@ def genetic_algorithm(model, max_iter=50, pop_size=100, max_crossover=10):
         for p in parents:
             children += multi_crossover(p[0], p[1], p[2], model, Rc=max_crossover)
         population = mutate(children, model, 10, els=0.95)
-        population = improve_crossover(population, model)
+        fitnesses = np.array([fitness_function_JSSP(p, model) for p in population])
+        best_index = np.argsort(fitnesses)[:k]
+        best_children = [population[i] for i in best_index]
+        best_children = improve_crossover(best_children, model)
+        for i, j in enumerate(best_index):
+            population[j] = best_children[i]
     return c_to_seq(best, model), [ys, time() - start]
 
 
 if __name__ == '__main__':
-    model = JSSP(2, 5, Processing_time=0, randopt=True)
+    model = JSSP(5, 5, Processing_time=0, randopt=True)
     res, stats = genetic_algorithm(model)
     print(res)
     print(model.get_end_time(res))
+    print(stats[1])
