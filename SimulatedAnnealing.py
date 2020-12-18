@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import math
+import time
 from JobShopScheduling import *
 
 
@@ -15,17 +16,19 @@ def findNeighbours(seq):
     return nbrs
 
 
-def simulatedAnnealing(job, T, maxIter, halting, decrease):
+def simulatedAnnealing(job, T, maxIter, halting, decrease, mode="normal"):
     seq = job.generate_rand_seq()
-    ys = []
-    cost = job.get_end_time(seq)
+
     for i in range(halting):
         T = decrease * float(T)
 
         for j in range(maxIter):
             cost = job.get_end_time(seq)
 
-            for k in findNeighbours(seq):
+            nlist = findNeighbours(seq)
+
+            if mode == "random":
+                k = random.choice(nlist)
                 k_cost = job.get_end_time(k)
                 if k_cost < cost:
                     seq = k
@@ -35,5 +38,35 @@ def simulatedAnnealing(job, T, maxIter, halting, decrease):
                     if random.random() < p:
                         seq = k
                         cost = k_cost
-        ys.append(cost)
-    return cost, seq, np.array(ys)
+
+            elif mode == "normal":
+                for k in nlist:
+                    k_cost = job.get_end_time(k)
+                    if k_cost < cost:
+                        seq = k
+                        cost = k_cost
+                    else:
+                        p = math.exp(-k_cost / T)
+                        if random.random() < p:
+                            seq = k
+                            cost = k_cost
+
+    return cost, seq, T
+
+
+def SAsearch(job, loopcount=100, T=200, maxIter=10, halting=10, decrease=0.8, mode="normal"):
+    costs = []
+    sols = []
+    best = math.inf
+    best_seq = None
+    # start = time.time()
+
+    seq = job.generate_rand_seq()
+    for i in range(loopcount):
+        cost, seq, _ = simulatedAnnealing(job, T, maxIter, halting, decrease)
+        if cost < best:
+            best = cost
+            best_seq = seq
+        costs.append(cost)
+
+    return best, best_seq, costs
