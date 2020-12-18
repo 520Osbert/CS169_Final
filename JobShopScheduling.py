@@ -81,7 +81,7 @@ class JSSP:
                 machine_end_time[machine] = end
                 job_end_time[i] = end
 
-        blocks = [mpatches.Patch(color=cmap[i], label="Job "+str(i)) for i in range(self.n_job)]
+        blocks = [mpatches.Patch(color=cmap[i], label="Job "+str(i+1)) for i in range(self.n_job)]
         ax.legend(handles=blocks, bbox_to_anchor=(1.05, 1), loc='upper left')
         ax.set_yticks(range(self.m_machine))
         ax.set_yticklabels(['Machine ' + str(i + 1) for i in range(self.m_machine)])
